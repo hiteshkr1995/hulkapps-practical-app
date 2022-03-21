@@ -59,5 +59,7 @@ php artisan serve
 ```
 
 ## Libraries
-	- [Laravel Tags](https://spatie.be/docs/laravel-tags/v4/introduction)
-	- [Bootstrap](https://getbootstrap.com/)
+
+[Laravel Tags](https://spatie.be/docs/laravel-tags/v4/introduction)
+
+[Bootstrap](https://getbootstrap.com/)
