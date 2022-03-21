@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,9 @@ use App\Http\Controllers\PostController;
 Auth::routes();
 
 Route::get('/', [PostController::class, 'index'])->name('welcome');
+
+Route::get('/change-password', [ProfileController::class, 'changePassword'])->name('change-password');
+Route::post('/change-password', [ProfileController::class, 'changePasswordUpdate'])->name('change-password-update');
 
 Route::post('/posts/{post}/comments', [PostController::class, 'commentStore'])->name('posts.comments.store');
 

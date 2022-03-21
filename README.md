@@ -7,7 +7,7 @@ This is the Post CRUD, Post Comment, Login, Register, Change password & forgot p
 ## Installation
 
 ```bash
-git clone 
+git clone https://github.com/hiteshkr1995/hulkapps-practical-app.git
 ```
 
 ```bash
@@ -48,6 +48,7 @@ MAIL_FROM_ADDRESS="hello@example.com"
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
+Now run this to setp up database
 ```bash
 php artisan migrate
 ```
@@ -56,3 +57,7 @@ php artisan migrate
 ```bash
 php artisan serve
 ```
+
+## Libraries
+[Laravel Tags](https://spatie.be/docs/laravel-tags/v4/introduction)
+[Bootstrap](https://getbootstrap.com/)
