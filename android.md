@@ -1,100 +1,73 @@
-If you're looking to integrate PayPal payment gateway into an Android app using Kotlin, you can follow a similar approach as mentioned earlier. Here's an example of how you can integrate PayPal into your Android app using Kotlin:
+To integrate Paytm payment gateway into an Android app without the need for a backend server, you can use the Paytm All-In-One SDK. Here's how you can do it:
 
-Step 1: Set up PayPal SDK
+Step 1: Add Paytm SDK dependency
 
-1. Add the PayPal SDK dependency to your app's `build.gradle` file:
+1. Add the Paytm SDK dependency to your app's `build.gradle` file:
 
 ```kotlin
 dependencies {
-    implementation 'com.paypal.sdk:paypal-android-sdk:2.0.0'
+    implementation 'com.paytm.appinvokesdk:appinvokesdk:2.8.5'
 }
 ```
 
 2. Sync your project to download the SDK.
 
-Step 2: Initialize PayPal
+Step 2: Initialize Paytm
 
 1. In your activity or fragment, import the necessary classes:
 
 ```kotlin
-import com.paypal.android.sdk.payments.*
-import com.paypal.android.sdk.payments.PayPalConfiguration
-import com.paypal.android.sdk.payments.PayPalPayment
+import com.paytm.appinvokesdk.PaytmError
+import com.paytm.appinvokesdk.callbacks.TransactionCallback
+import com.paytm.appinvokesdk.models.InitiateTransactionRequestBody
+import com.paytm.appinvokesdk.models.InitiateTransactionResponseBody
+import com.paytm.appinvokesdk.models.TransactionInfo
+import com.paytm.appinvokesdk.models.TransactionStatus
+import com.paytm.appinvokesdk.models.UserInfo
+import com.paytm.appinvokesdk.models.UserType
 ```
 
-2. Create a PayPalConfiguration object and set the necessary configuration options. For example:
+2. Create a `UserInfo` object to specify the user details:
 
 ```kotlin
-private val PAYPAL_CLIENT_ID = "YOUR_PAYPAL_CLIENT_ID"
-private val PAYPAL_REQUEST_CODE = 123
-
-private val config = PayPalConfiguration()
-    .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
-    .clientId(PAYPAL_CLIENT_ID)
+val userInfo = UserInfo("USER_ID", "USER_NAME", UserType.CUSTOMER)
 ```
 
-Make sure to replace `"YOUR_PAYPAL_CLIENT_ID"` with your actual PayPal client ID. Use the sandbox environment for testing purposes and switch to the live environment when ready for real payments.
-
-3. Start the PayPal service in your `onCreate()` or `onResume()` method:
+3. Create an `InitiateTransactionRequestBody` object to specify the transaction details:
 
 ```kotlin
-override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
-
-    val intent = Intent(this, PayPalService::class.java)
-    intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config)
-    startService(intent)
-}
+val requestBody = InitiateTransactionRequestBody(
+    orderId = "ORDER_ID",
+    txnAmount = "10.00",
+    userInfo = userInfo
+)
 ```
 
-4. Stop the PayPal service in your `onDestroy()` or `onPause()` method:
+Replace `"ORDER_ID"` with your actual order ID and `"10.00"` with the transaction amount.
+
+4. Initialize the Paytm SDK and start the payment transaction:
 
 ```kotlin
-override fun onDestroy() {
-    stopService(Intent(this, PayPalService::class.java))
-    super.onDestroy()
-}
-```
-
-Step 3: Make a payment request
-
-1. Create a PayPalPayment object to specify the details of the payment. For example:
-
-```kotlin
-val payment = PayPalPayment(BigDecimal("10.00"), "USD", "Payment for something", PayPalPayment.PAYMENT_INTENT_SALE)
-```
-
-2. Create an intent for the PaymentActivity and pass the PayPalPayment object:
-
-```kotlin
-val intent = Intent(this, PaymentActivity::class.java)
-intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config)
-intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment)
-startActivityForResult(intent, PAYPAL_REQUEST_CODE)
-```
-
-3. Handle the payment result in the `onActivityResult()` method:
-
-```kotlin
-override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-    if (requestCode == PAYPAL_REQUEST_CODE) {
-        if (resultCode == Activity.RESULT_OK) {
-            val confirm = data?.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION) as? PaymentConfirmation
-            if (confirm != null) {
-                val paymentId = confirm.proofOfPayment.paymentId
-                // Handle the successful payment
-            }
-        } else if (resultCode == Activity.RESULT_CANCELED) {
-            // The user canceled the payment
-        } else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
-            // Invalid payment configuration
-        }
+PaytmSDK.initiateTransaction(context, requestBody, object : TransactionCallback {
+    override fun onTransactionInitiated(responseBody: InitiateTransactionResponseBody) {
+        // Transaction initiated successfully
+        val transactionInfo = TransactionInfo(
+            orderId = responseBody.orderId,
+            transactionToken = responseBody.transactionToken
+        )
+        PaytmSDK.startTransaction(context, transactionInfo)
     }
-}
+
+    override fun onError(error: PaytmError) {
+        // Transaction initialization failed
+    }
+
+    override fun onTransactionStatus(status: TransactionStatus) {
+        // Handle transaction status updates
+    }
+})
 ```
 
-That's it! You have now integrated PayPal payment into your Android app using Kotlin without the need for a backend server. Remember to replace `"YOUR_PAYPAL_CLIENT_ID"` with your actual PayPal client ID. Test your app thoroughly, and when you're ready to accept real payments, switch to the live environment by changing the configuration to `ENV
+5. Handle the transaction status updates in the `onTransactionStatus()` method.
 
-IRONMENT_PRODUCTION` and using your live client ID.
+That's it! You have now integrated Paytm payment gateway into your Android app without the need for a backend server. Test your app thoroughly, and when you're ready to accept real payments, replace the `USER_ID` and `USER_NAME` with your actual user details, and replace the `ORDER_ID` and transaction amount with actual values.
